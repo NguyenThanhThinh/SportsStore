@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using SportsStore.Data;
 using SportsStore.Data.Extensions;
 using System;
@@ -27,6 +28,10 @@ namespace SportsStore
 			services.AddControllersWithViews();
 			services.AddDbContext<SportsStoreDbContext>(options =>
 			options.UseSqlServer(Configuration.GetConnectionString("SportsStoreDbContext")));
+			services.AddSwaggerGen(options => {
+				options.SwaggerDoc("v1",
+				new OpenApiInfo { Title = "SportsStore API", Version = "v1" });
+			});
 			// In production, the Angular files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{
@@ -63,7 +68,11 @@ namespace SportsStore
 					name: "default",
 					pattern: "{controller}/{action=Index}/{id?}");
 			});
-
+			app.UseSwagger();
+			app.UseSwaggerUI(options => {
+				options.SwaggerEndpoint("/swagger/v1/swagger.json",
+				"SportsStore API");
+			});
 			app.UseSpa(spa =>
 			{
 				// To learn more about options for serving an Angular SPA from ASP.NET Core,
