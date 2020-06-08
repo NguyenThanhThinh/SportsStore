@@ -12,8 +12,11 @@ export class AppComponent {
 
   }
 
-  getProduct(): Product {
-
+  get product(): Product {
     return this.repo.product;
+  }
+
+  get products(): Product[] {
+    return this.repo.products;
   }
 }

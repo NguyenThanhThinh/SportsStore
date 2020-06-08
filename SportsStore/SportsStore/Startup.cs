@@ -25,6 +25,7 @@ namespace SportsStore
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddCors();
 			services.AddControllersWithViews();
 			services.AddDbContext<SportsStoreDbContext>(options =>
 			options.UseSqlServer(Configuration.GetConnectionString("SportsStoreDbContext")));
@@ -32,6 +33,7 @@ namespace SportsStore
 				options.SwaggerDoc("v1",
 				new OpenApiInfo { Title = "SportsStore API", Version = "v1" });
 			});
+		
 			// In production, the Angular files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{
@@ -52,7 +54,12 @@ namespace SportsStore
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
-
+			app.UseCors(options =>
+			{
+				options.WithOrigins("https://localhost:5000").AllowAnyMethod().AllowAnyHeader();
+				options.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+				options.WithOrigins("https://localhost:44315").AllowAnyMethod().AllowAnyHeader();
+			});
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			if (!env.IsDevelopment())
@@ -61,7 +68,7 @@ namespace SportsStore
 			}
 
 			app.UseRouting();
-
+		
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllerRoute(
@@ -73,16 +80,17 @@ namespace SportsStore
 				options.SwaggerEndpoint("/swagger/v1/swagger.json",
 				"SportsStore API");
 			});
-			app.UseSpa(spa =>
-			{
-				// To learn more about options for serving an Angular SPA from ASP.NET Core,
-				// see https://go.microsoft.com/fwlink/?linkid=864501
-
-				spa.Options.SourcePath = "ClientApp";
-
-				if (env.IsDevelopment())
+			app.UseSpa(spa => {
+				string strategy = Configuration
+					.GetValue<string>("DevTools:ConnectionStrategy");
+				if (strategy == "proxy")
 				{
-					spa.UseAngularCliServer(npmScript: "start");
+					spa.UseProxyToSpaDevelopmentServer("http://127.0.0.1:4200");
+				}
+				else if (strategy == "managed")
+				{
+					spa.Options.SourcePath = "ClientApp";
+					spa.UseAngularCliServer("start");
 				}
 			});
 
