@@ -32,6 +32,7 @@ namespace SportsStore.Controllers
             {
                 Supplier data = supplier;        
                 sportsStoreDb.Add(data);
+                sportsStoreDb.SaveChanges();
                 return Ok(data.SupplierId);
             }
             else

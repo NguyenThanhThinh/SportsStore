@@ -11,17 +11,17 @@ using SportsStore.Models;
 
 namespace SportsStore.Controllers
 {
-	[Route("api/products")]
-	[ApiController]
+    [Route("api/products")]
+    [ApiController]
 
-	public class ProductController : ControllerBase
-	{
-		private SportsStoreDbContext sportsStoreDb;
+    public class ProductController : ControllerBase
+    {
+        private SportsStoreDbContext sportsStoreDb;
 
-		public ProductController(SportsStoreDbContext sportsStoreDb)
-		{
-			this.sportsStoreDb = sportsStoreDb;
-		}
+        public ProductController(SportsStoreDbContext sportsStoreDb)
+        {
+            this.sportsStoreDb = sportsStoreDb;
+        }
         [HttpGet("{id}")]
         public Product GetProduct(long id)
         {
@@ -79,7 +79,8 @@ namespace SportsStore.Controllers
             {
                 query = query.Include(p => p.Supplier).Include(p => p.Ratings);
                 List<Product> data = query.ToList();
-                data.ForEach(p => {
+                data.ForEach(p =>
+                {
                     if (p.Supplier != null)
                     {
                         p.Supplier.Products = null;
@@ -94,6 +95,24 @@ namespace SportsStore.Controllers
             else
             {
                 return query;
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CreateProduct([FromBody] Product product)
+        {
+            if (ModelState.IsValid)
+            {
+                Product data = product;
+
+                if (data.Supplier != null && data.Supplier.SupplierId != 0) sportsStoreDb.Attach(data.Supplier);
+                sportsStoreDb.Add(data);
+                sportsStoreDb.SaveChanges();
+                return Ok(data.ProductId);
+            }
+            else
+            {
+                return BadRequest(ModelState);
             }
         }
     }

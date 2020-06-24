@@ -11,10 +11,10 @@ export class Repository {
 
   product: Product;
   products: Product[];
-  suppliers : Supplier[];
+  suppliers: Supplier[];
   filter: Filter = new Filter();
   constructor(private http: HttpClient) {
-    this.filter.category = "soccer";
+    //this.filter.category = "soccer";
     this.filter.related = true;
     this.getProducts();
   }
@@ -40,6 +40,35 @@ export class Repository {
   getSupplier() {
     this.http.get<Supplier[]>(`${environment.baseUrL}/api/suppliers`)
       .subscribe(p => this.suppliers = p);
+  }
+
+  createProduct(product: Product) {
+    let data = {
+      name: product.name, category: product.category,
+      description: product.description, price: product.price,
+      supplier: product.supplier ? product.supplier.supplierId : 0
+    };
+
+    this.http.post<number>(`${environment.baseUrL}/api/products`, data).
+      subscribe(id => {
+        product.productId = id;
+        this.products.push(product);
+      });
+
+  }
+  createProductAndSupplier(product: Product, supplier: Supplier) {
+    let data = {
+      name: supplier.name, city: supplier.city, state: supplier.state
+    }
+
+    this.http.post<number>(`${environment.baseUrL}/api/suppliers`, data).
+      subscribe(id => {
+        supplier.supplierId = id;
+        this.suppliers.push(supplier);
+
+        if (product != null) this.createProduct(product);
+      });
+
   }
 
 }
