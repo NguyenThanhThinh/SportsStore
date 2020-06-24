@@ -4,12 +4,14 @@ import { Product } from "./product.model";
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Filter } from './configClasses.repository';
+import { Supplier } from './supplier.model';
 
 @Injectable()
 export class Repository {
 
   product: Product;
   products: Product[];
+  suppliers : Supplier[];
   filter: Filter = new Filter();
   constructor(private http: HttpClient) {
     this.filter.category = "soccer";
@@ -33,6 +35,11 @@ export class Repository {
       url += `&search=${this.filter.search}`;
     }
     this.http.get<Product[]>(url).subscribe(prods => this.products = prods);
+  }
+
+  getSupplier() {
+    this.http.get<Supplier[]>(`${environment.baseUrL}/api/suppliers`)
+      .subscribe(p => this.suppliers = p);
   }
 
 }
