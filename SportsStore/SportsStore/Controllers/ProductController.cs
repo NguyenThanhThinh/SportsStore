@@ -120,7 +120,7 @@ namespace SportsStore.Controllers
         }
 
         [HttpPut("{Id}")]
-        public IActionResult ReplaceProduct(long Id, [FromBody] Product product)
+        public IActionResult ReplaceProduct( long Id, [FromBody] Product product )
         {
             if (ModelState.IsValid)
             {
@@ -130,7 +130,7 @@ namespace SportsStore.Controllers
 
                 if (data.Supplier != null && data.Supplier.SupplierId != 0) sportsStoreDb.Attach(data.Supplier);
 
-                sportsStoreDb.Update(data);
+                sportsStoreDb.Update( data );
 
                 sportsStoreDb.SaveChanges();
 
