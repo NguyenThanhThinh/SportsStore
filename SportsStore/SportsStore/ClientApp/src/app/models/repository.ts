@@ -70,5 +70,24 @@ export class Repository {
       });
 
   }
+  replaceProduct(product: Product) {
+    let data = {
+      name: product.name, category: product.category,
+      description: product.description, price: product.price,
+      supplier: product.supplier ? product.supplier.supplierId : 0
+    };
 
+    this.http.put(`${environment.baseUrL}/api/products/${product.productId}`, data).
+   subscribe(() => this.getProducts());
+
+  }
+  replaceSupplier(supplier: Supplier) {
+    let data = {
+      name: supplier.name, city: supplier.city, state: supplier.state
+    }
+
+     this.http.put(`${environment.baseUrL}/api/suppliers/${supplier.supplierId}`, data).
+       subscribe(() => this.getProducts());
+
+  }
 }

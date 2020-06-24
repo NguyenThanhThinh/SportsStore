@@ -106,8 +106,34 @@ namespace SportsStore.Controllers
                 Product data = product;
 
                 if (data.Supplier != null && data.Supplier.SupplierId != 0) sportsStoreDb.Attach(data.Supplier);
+
                 sportsStoreDb.Add(data);
+
                 sportsStoreDb.SaveChanges();
+
+                return Ok(data.ProductId);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
+
+        [HttpPut("{Id}")]
+        public IActionResult ReplaceProduct(long Id, [FromBody] Product product)
+        {
+            if (ModelState.IsValid)
+            {
+                Product data = product;
+
+                data.ProductId = Id;
+
+                if (data.Supplier != null && data.Supplier.SupplierId != 0) sportsStoreDb.Attach(data.Supplier);
+
+                sportsStoreDb.Update(data);
+
+                sportsStoreDb.SaveChanges();
+
                 return Ok(data.ProductId);
             }
             else
